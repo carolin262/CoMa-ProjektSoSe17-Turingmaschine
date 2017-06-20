@@ -1,0 +1,19 @@
+\section*{3. Aufgabe}
+\subsection*{a)}
+\includegraphics[scale=0.5]{HA3Nr3Baum.png}
+\subsection*{b)}
+\textbf{istLinksVon (Array order[], Schlüssel key, Schlüssel position)}\\
+\textbf{Input:} Ein Array, ein Element, dessen Position zum Element position aus preorder relativ zu bestimmen ist\\
+\textbf{Output:} true, falls key in preorder links von position gefunden wird, false sonst
+\begin{algorithmic}
+\For {(i = 0 to i = preorder.length -1)}
+\If {(preorder[i] = key)}
+\State \Return true
+\EndIf
+\If {(preorder[i] = position)}
+\State \Return false
+\EndIf
+\EndFor
+\end{algorithmic}
+\newpage
+
