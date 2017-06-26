@@ -1,7 +1,7 @@
 \frametitle{CoMa Turingmaschine}
 
  \begin{itemize}
- \item Eingabealphabet : ['26', '1']
+ \item Eingabealphabet : ['11']
  \item Bandalphabet : [1, 2, 3]
  \item Leerzeichen : B
  \item anzahl an Zustaenden : 2
@@ -18,12 +18,12 @@
  \node [on chain=1,tmtape,draw=none] {$\ldots$};
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {26};
+ \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {wtf};
  \node [on chain=1,tmtape] {1};
- \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {78};
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
@@ -38,7 +38,7 @@
  \begin{scope}[start chain=2 going right]
  \node [draw,left=3cm,arrow box,name=p,on chain=2,arrow box arrows={north:.5cm},minimum size=0.5cm] {};
  \draw[on chain=2]{};
- \node [draw, name=q,left=0cm,on chain=2]{q1};
+ \node [draw, name=q,left=0cm,on chain=2]{q3};
  \draw [<-] (p) -- (q);
  \chainin (q) [join];
  \end{scope}

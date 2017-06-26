@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 import os, sys, subprocess, copy
 class VisualTM:
-    def __init__(self,bandalpha,einalpha,nozust,akztzust,leerzeichen):
+    def __init__(self,band,bandalpha,einalpha,nozust,akztzust,leerzeichen):
         self.grunddokument=""
         self.bandtikz=""
         self.tmtikz=""
         self.viewername="Adobe"
         self.einalpha=einalpha      #List
         self.bandalpha=bandalpha    #List
-        self.neu_band=copy.deepcopy(einalpha)     #List
+        self.neu_band=copy.deepcopy(band)     #List
+        self.band=band              #List
         self.nozust=nozust          #Int
         self.kopf_q="q0"            #String
         self.leerzeichen=leerzeichen#String
@@ -51,7 +52,7 @@ class VisualTM:
 \n \
 \\begin{itemize} \n \
 \item Eingabealphabet : '
-        dokument=dokument+str(self.neu_band) 
+        dokument=dokument+str(self.einalpha) 
         dokument=dokument+' \n \
 \item Bandalphabet : '
         dokument=dokument+str(self.bandalpha)
@@ -64,7 +65,8 @@ class VisualTM:
         dokument=dokument+' \n \
 \item akzept. Zustaende : '
         dokument=dokument+str(self.akztzust)
-        dokument=dokument+'\n \
+        dokument=dokument+\
+'\n \
 \end{itemize} \n \
 \\begin{figure} \n \
 \\begin{tikzpicture} \n \
@@ -76,7 +78,7 @@ class VisualTM:
 \\begin{scope}[start chain=1 going right,node distance=-0.15mm] \n \
 \\node [on chain=1,tmtape,draw=none] {$\\ldots$}; \n \
 '
-        dokument=dokument+self.get_anfang_end_band(self.einalpha)
+        dokument=dokument+self.get_anfang_end_band(self.band)
         dokument=dokument+' \n \
 \\node [on chain=1,tmtape,draw=none] {$\ldots$}; \n \
 \end{scope} \n \
@@ -97,7 +99,7 @@ class VisualTM:
 \end{frame} \n'
         for i in range(len(frames)):
             dokument = dokument + frames[i] #self.get_tmtikz([12,2,3],einalpha,bandalpha,nozust,akztzust)
-        dokument = dokument + "\end{document}"
+        dokument=dokument+'\end{document}'
         return(dokument)
     
     def get_tmtikz(self,band):
@@ -109,7 +111,7 @@ class VisualTM:
 \n \
 \\begin{itemize} \n \
 \item Eingabealphabet : '
-        tmframe=tmframe+str(self.neu_band) 
+        tmframe=tmframe+str(self.einalpha) 
         tmframe=tmframe+' \n \
 \item Bandalphabet : '
         tmframe=tmframe+str(self.bandalpha)
@@ -184,13 +186,24 @@ class VisualTM:
         band=""
         bandlaenge=len(self.neu_band)
         bandindex,platzhaltermitte=0,0
-        if len(self.neu_band)<=band_position_alt:
+        if len(self.neu_band)<band_position_alt:
             self.neu_band.append(str(self.leerzeichen))
             bandindex=bandindex-1
             bandlaenge+=1
-        self.neu_band[band_position_alt]=band_wert_neu  #setzt neuen Bandwert
+        if band_position_alt < 0:
+            bandindex=bandindex-1
+            bandlaenge+=1
+            help=[]
+            help=copy.deepcopy(self.neu_band)
+            self.neu_band=[]
+            self.neu_band.append(band_wert_neu)
+            for i,e in enumerate(help):
+                self.neu_band.append(e)
+        else:
+            self.neu_band[band_position_alt]=band_wert_neu  #setzt neuen Bandwert
         self.kopf_q=kopf_q                              #setzt neuen Kopfzustand q_
         platzhalterVorne=3-(band_position_neu)
+
         for i in range(platzhalterVorne): #vorne auffuellen mit leerzeichen bis zum akt.Zustand
             band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
             bandindex=bandindex+1
@@ -239,12 +252,11 @@ class VisualTM:
         else:
             subprocess.Popen("%s %s" % (self.viewername, pdf))
 
-    
+def test():    
+    VTM=VisualTM([1,2,3],[str(11),str(22),str(33),str(44),str(55),str(112),str(222),str(332),str(113),str(223),str(333),str(114),str(224),str(334)],2,"q1,q2","B")
+    VTM=VisualTM([str(21),str(78)],[1,2,3],[str(11)],2,"q1,q2","B")
 
-#VTM=VisualTM([1,2,3],[str(11),str(22),str(33),str(44),str(55),str(112),str(222),str(332),str(113),str(223),str(333),str(114),str(224),str(334)],2,"q1,q2","B")
-VTM=VisualTM([1,2,3],[str(11)],2,"q1,q2","B")
-
-frame=[VTM.draw_frame(0,"26","q5",1),VTM.draw_frame(1,"1","q1",1)]
-VTM.write_file(VTM.get_grunddokument(frame))
-VTM.set_viewername("Sumatra")
-VTM.visualize()
+    frame=[VTM.draw_frame(0,"26","q5",0),VTM.draw_frame(0,"1","q1",-1),VTM.draw_frame(-1,"wtf","q3",-2)]
+    VTM.write_file(VTM.get_grunddokument(frame))
+    VTM.set_viewername("Sumatra")
+    VTM.visualize()
