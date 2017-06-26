@@ -253,10 +253,10 @@ class VisualTM:
             subprocess.Popen("%s %s" % (self.viewername, pdf))
 
 def test():    
-    VTM=VisualTM([1,2,3],[str(11),str(22),str(33),str(44),str(55),str(112),str(222),str(332),str(113),str(223),str(333),str(114),str(224),str(334)],2,"q1,q2","B")
+    #VTM=VisualTM([1,2,3],[str(11),str(22),str(33),str(44),str(55),str(112),str(222),str(332),str(113),str(223),str(333),str(114),str(224),str(334)],2,"q1,q2","B")
     VTM=VisualTM([str(21),str(78)],[1,2,3],[str(11)],2,"q1,q2","B")
 
-    frame=[VTM.draw_frame(0,"26","q5",0),VTM.draw_frame(0,"1","q1",-1),VTM.draw_frame(-1,"wtf","q3",-2)]
+    frame=[VTM.draw_frame(0,"26","q5",0),VTM.draw_frame(0,"1","q1",1),VTM.draw_frame(1,"wtf","q3",2)]
     VTM.write_file(VTM.get_grunddokument(frame))
     VTM.set_viewername("Sumatra")
     VTM.visualize()

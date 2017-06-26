@@ -21,12 +21,12 @@
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {B};
+ \node [on chain=1,tmtape] {wtf};
+ \node [on chain=1,tmtape] {1};
  \node [on chain=1,tmtape] {wtf};
  \node [on chain=1,tmtape] {1};
  \node [on chain=1,tmtape] {78};
- \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {B};
- \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
  \node [on chain=1,tmtape] {B};
 
