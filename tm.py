@@ -1,10 +1,12 @@
+import visual
+
 class TM(object):
     def __init__(self, input_alphabet, blank, description):
         self.blank = blank
         self.state = 'q0'
         head_pos = 0
         self.input_alphabet = input_alphabet.split(',')
-        self.table = { tuple(x.split(',')) : y.split(',') for x,y in (l.split('>') for l in description) }
+        self.table = { tuple(x.strip().split(',')) : y.strip().split(',') for x,y in (l.split('>') for l in description) }
 
     def exec_TM(inputstring):
         pass # overwritten
@@ -28,13 +30,14 @@ class TM(object):
         return 0 # N or other letters
 
     @staticmethod
-    def _parse_file(path):
+    def _parse_file(path,tape):
         with open(path, 'r') as f:
-            return read_tm(f.readlines())
+            return read_tm(iter(f.readlines()),tape)
 
 class OneTapeTM(TM):
-    def __init__(self, blank, F, description):
-        TM.__init__(self, blank, F, description)
+    def __init__(self, blank,description, F): #ToDo umbennenen
+        self.slides=[] 
+        TM.__init__(self, blank, description, F)
 
     def exec_TM(self, initial_tape):
         assert self.check_input(initial_tape)
@@ -53,11 +56,12 @@ class OneTapeTM(TM):
             new_state, write, direct = self.table[state_tuple]
             new_pos = head_pos + self.translate_dir(direct)
             
-            yield head_pos, write, new_state, new_pos - shift_count
+            yield head_pos - shift_count, write, new_state, new_pos - shift_count
 
             tape[head_pos] = write
             head_pos = new_pos
             self.state = new_state
+            print(["B"]*(3-shift_count)+tape)
 
 class TwoTapeTM(TM):
     def __init__(self, blank, F, description):
@@ -103,17 +107,38 @@ class TwoTapeTM(TM):
 
 # Reads a TM description, returns an appropriate TM object
 # description is an iterator over lines
-def read_tm(description):
+def read_tm(description,tape):
     header = next(description)
     #analyze header fields
     print(header.split('|'))
     num_tapes, num_states, sigma, gamma, blank, F = header.split('|')
     if num_tapes == "1":
-        return OneTapeTM(sigma, blank, description)
+        VTM=visual.VisualTM(tape,sigma,gamma,num_states,F,blank)
+        return OneTapeTM(sigma, blank, description),VTM
     elif num_tapes == "2":
-        return TwoTapeTM(sigma, blank, description)
+        return TwoTapeTM(sigma, blank, description),0
     else:
         assert False
+
+"""
+inp=["1","1","0","0","1","1","0"]
+bsp=TM._parse_file("./bsp2vl.py",inp)
+#bsp=TM._parse_file("./CollatzTM.py")
+colli=bsp[0]
+VTM=bsp[1]
+slides=[]
+i=0
+for x in colli.exec_TM(inp): 
+    if i>300:
+        break
+    i+=1
+    print(x)
+    slides.append(VTM.draw_frame(*x))
+VTM.write_file(VTM.get_grunddokument(slides))
+VTM.visualize()
+
+
+
 
 if __name__=="__main__":
     print("one tape")
@@ -127,3 +152,4 @@ if __name__=="__main__":
     tm=read_tm(description)
     print(tm.table)
     for x in tm.exec_TM(['0']): print(x)
+"""
