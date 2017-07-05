@@ -7,9 +7,9 @@ class VisualTM:
         self.bandtikz=""
         self.tmtikz=""
         self.leerzeichen=leerzeichen#String
-        self.viewername="Adobe"
         self.einalpha=einalpha      #List
         self.bandalpha=bandalpha    #List
+        self.viewername=''
         self.neu_band=[self.leerzeichen]*1000+band+[self.leerzeichen]*1000    #List
         self.band=band              #List
         self.nozust=nozust          #Int
@@ -159,24 +159,19 @@ class VisualTM:
     
     def get_anfang_end_band(self,endband):
         band=""
-        bandindex=0
-        for i in range(3): #vorne auffuellen mit leerzeichen bis zum akt.Zustand
-            band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
-            bandindex+=1
-        for i in range(len(endband)):     # Band aufmalen ausser es geht aus dem Band raus 
-            if (bandindex) > 12:
-                break
-            #if self.neu_band[i]==str(self.leerzeichen):
-            #    band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
-            #    bandindex=bandindex+1
-            #    platzhaltermitte+=1
-            #else:
-            band=band+"\\node [on chain=1,tmtape] {"+str(endband[i])+"}; \n "
-            bandindex=bandindex+1
+        anzeige=[]
+        start=1000
+        #print(self.neu_band,band_position_alt)
+        
+        #print(self.neu_band)
+        anzeige=self.neu_band[0:3]+endband+self.neu_band[3+len(endband):-1] #setzt neuen Bandwert
 
-        for i in range(13-bandindex):
-            band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
-            bandindex=bandindex+1
+        #print(anzeige)
+        for i in range(13):    # Band aufmalen ausser es geht aus dem Band raus 
+            if anzeige[i]!= self.leerzeichen :
+                band=band+"\\node [on chain=1,tmtape] {"+str(anzeige[i])+"}; \n "
+            else:
+                band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
         return band
 
 
@@ -185,17 +180,19 @@ class VisualTM:
         #einen Knoten auf dem Band
         band=""
         anzeige=[]
-        start=10
+        start=1000
         #print(self.neu_band,band_position_alt)
         
         #print(self.neu_band)
         self.neu_band[start+band_position_alt]=band_wert_neu
         anzeige=self.neu_band[start-3+band_position_neu:start+10+band_position_neu] #setzt neuen Bandwert
+        
+        print("neu_band",anzeige)
         self.kopf_q=kopf_q #neuer Kopfzustand
 
         #print(anzeige)
         for i in range(13):    # Band aufmalen ausser es geht aus dem Band raus 
-            if anzeige[i]!="B":
+            if anzeige[i]!= self.leerzeichen :
                 band=band+"\\node [on chain=1,tmtape] {"+str(anzeige[i])+"}; \n "
             else:
                 band=band+"\\node [on chain=1,tmtape] {"+str(self.leerzeichen)+"}; \n "
@@ -212,28 +209,16 @@ class VisualTM:
         TMVisual.close()
     
     def set_viewername(self,name):
-        if name=="Foxit":
-            acrobatPath = r'C:/Program Files (x86)/Foxit Software/FoxitReader/FoxitReader.exe'
-        elif name=="Sumatra":
-            acrobatPath = r'C:/Program Files/SumatraPDF/SumatraPDF.exe'
-            
-        self.viewername=acrobatPath
-    
+        self.viewername=name    
+
     def visualize(self):
-        os.system("texify -p TMvisual.tex")
+        print("...the machine is still turing... DO NOT SHUT DOWN...")
+        os.system("texify -p TMvisual.tex >nul")
 
         pdf = "TMvisual.pdf"
-        
-        if self.viewername=="Adobe":
-            os.startfile("TMvisual.pdf")
+        if self.viewername=='':
+            os.startfile(pdf)
         else:
             subprocess.Popen("%s %s" % (self.viewername, pdf))
 
-def test():    
-    #VTM=VisualTM([1,2,3],[str(11),str(22),str(33),str(44),str(55),str(112),str(222),str(332),str(113),str(223),str(333),str(114),str(224),str(334)],2,"q1,q2","B")
-    VTM=VisualTM([str(21),str(78)],[1,2,3],[str(11)],2,"q1,q2","B")
 
-    frame=[VTM.draw_frame(0,"26","q5",0),VTM.draw_frame(0,"1","q1",1),VTM.draw_frame(1,"wtf","q3",2)]
-    VTM.write_file(VTM.get_grunddokument(frame))
-    VTM.set_viewername("Sumatra")
-    VTM.visualize()

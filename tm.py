@@ -1,8 +1,12 @@
 import visual
 
 class TM(object):
-    def __init__(self, input_alphabet, blank, description):
+    def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
         self.blank = blank
+        self.F=F
+        self.num_tapes=num_tapes
+        self.num_states=num_states
+        self.gamma=gamma
         self.state = 'q0'
         head_pos = 0
         self.input_alphabet = input_alphabet.split(',')
@@ -10,6 +14,10 @@ class TM(object):
 
     def exec_TM(inputstring):
         pass # overwritten
+
+    def exec_TMHELP(inputstring):
+        pass # overwritten
+
 
     def check_input(self, tape):
         print('blank',self.blank, 'alphabet',self.input_alphabet)
@@ -30,21 +38,30 @@ class TM(object):
         return 0 # N or other letters
 
     @staticmethod
-    def _parse_file(path,tape):
+    def _parse_file(path):
         with open(path, 'r') as f:
-            return read_tm(iter(f.readlines()),tape)
+            return read_tm(iter(f.readlines()))
 
 class OneTapeTM(TM):
-    def __init__(self, blank,description, F): #ToDo umbennenen
-        self.slides=[] 
-        TM.__init__(self, blank, description, F)
+    def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
+        TM.__init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma,F)
 
-    def exec_TM(self, initial_tape):
+    def exec_TM(self,inputstring):
+        return list(self.exec_TMHELP(inputstring))
+
+    def exec_TMHELP(self, initial_tape):
         assert self.check_input(initial_tape)
         head_pos = 0
         tape = initial_tape[:]
         shift_count = 0;
+        endless=set()
         while True:
+            remember = self.state, head_pos, tuple(tape)
+            if remember in endless :
+                print("Endlosschleife")
+                break
+            else:
+                endless.add(remember)
             shift, tape, head_pos = self.fix_tape(tape, head_pos)
             shift_count += shift
 
@@ -64,11 +81,15 @@ class OneTapeTM(TM):
             print(["B"]*(3-shift_count)+tape)
 
 class TwoTapeTM(TM):
-    def __init__(self, blank, F, description):
-        TM.__init__(self, blank, F, description)
+    def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
+        TM.__init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F)
         head_pos2 = 0
 
-    def exec_TM(self, initial_tape, initial_tape2=[]):
+    
+    def exec_TM(self,inputstring):
+        return list(self.exec_TMHELP(inputstring))
+
+    def exec_TMHELP(self, initial_tape, initial_tape2=[]):
         assert self.check_input(initial_tape)
         assert self.check_input(initial_tape2)
         head_pos, head2_pos = 0,0
@@ -96,7 +117,8 @@ class TwoTapeTM(TM):
             # it would probably make more sense to provide more info here.
             # like, the second tape
             yield head_pos, write, new_state, new_pos - shift_count
-
+            print(tape1,head_pos-shift_count, write, new_state, new_pos - shift_count,
+tape2)
             tape1[head_pos] = write
             tape2[head_pos2] = write2
             head_pos = new_pos
@@ -107,16 +129,16 @@ class TwoTapeTM(TM):
 
 # Reads a TM description, returns an appropriate TM object
 # description is an iterator over lines
-def read_tm(description,tape):
+def read_tm(description):
+    print("d", description)
     header = next(description)
     #analyze header fields
-    print(header.split('|'))
+    #print(header.split('|'))
     num_tapes, num_states, sigma, gamma, blank, F = header.split('|')
     if num_tapes == "1":
-        VTM=visual.VisualTM(tape,sigma,gamma,num_states,F,blank)
-        return OneTapeTM(sigma, blank, description),VTM
+        return OneTapeTM(sigma, blank, description, num_tapes, num_states, gamma, F)
     elif num_tapes == "2":
-        return TwoTapeTM(sigma, blank, description),0
+        return TwoTapeTM(sigma, blank, description, num_tapes, num_states, gamma, F)
     else:
         assert False
 
