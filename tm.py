@@ -20,10 +20,23 @@ class TM(object):
 
 
     def check_input(self, tape):
+        """
+        checks whether input is based on the input_alphabet and blanks
+        input: tape List
+        output: tape List
+        """
         print('blank',self.blank, 'alphabet',self.input_alphabet)
         return all((i == self.blank or i in self.input_alphabet for i in tape))
 
     def fix_tape(self, tape, head_pos):
+        """
+        checks whether the tape is too short
+        if so, it appends an blank to the right side
+        Input: tape List
+               head_pos Int
+        Output: 0/1 , tape, head_pos
+                
+        """
         # did we leave the tape to the left?
         if head_pos < 0:
             return 1, [self.blank] + tape, 0
@@ -33,20 +46,36 @@ class TM(object):
         return 0, tape, head_pos
 
     def translate_dir(self, direction):
+        """
+        Input: direction String
+        Output: 1/-1/0 Int
+        Converts R to 1
+        and L to -1
+        """
         if direction == "R": return 1
         if direction == "L": return -1
         return 0 # N or other letters
 
     @staticmethod
     def _parse_file(path):
+        """
+        Opens file under path, 
+        Input: path link to file
+        Output: Uebergangstabelle as turingmachine
+                conform lines
+        """
+        print("Reading file",path)
         with open(path, 'r') as f:
             return read_tm(iter(f.readlines()))
 
 class OneTapeTM(TM):
+    #   class of One Tape Turingmachine,
+    #   vererbt bei Turingmachine class at the top
     def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
         TM.__init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma,F)
 
     def exec_TM(self,inputstring):
+        #Input: inputstring Lis
         return list(self.exec_TMHELP(inputstring))
 
     def exec_TMHELP(self, initial_tape):
@@ -92,19 +121,20 @@ class TwoTapeTM(TM):
     def exec_TMHELP(self, initial_tape, initial_tape2=[]):
         assert self.check_input(initial_tape)
         assert self.check_input(initial_tape2)
-        head_pos, head2_pos = 0,0
+        head_pos, head_pos2 = 0,0
         tape1 = initial_tape[:]
         tape2 = initial_tape2[:]
         shift_count = 0;
         shift_count2 = 0;
+        i=0
         while True:
             shift, tape1, head_pos = self.fix_tape(tape1, head_pos)
-            shift2, tape2, head_pos2 = self.fix_tape(tape2, head_pos)
+            shift2, tape2, head_pos2 = self.fix_tape(tape2, head_pos2)
             shift_count += shift
             shift_count2 += shift2
 
             state_tuple = (self.state, tape1[head_pos], tape2[head_pos2])
-            print(state_tuple)
+            print("state",state_tuple, head_pos, head_pos2)
             if not state_tuple in self.table:
                 break # no transition left
 
@@ -112,15 +142,15 @@ class TwoTapeTM(TM):
             new_state, write, write2, direct, direct2 = self.table[state_tuple]
             new_pos = head_pos + self.translate_dir(direct)
             new_pos2 = head_pos2 + self.translate_dir(direct2)
-            
+            print(direct, direct2, new_pos, new_pos2)
+            print(tape1, tape2)
             # this is just for compatibility with the one tape machine.
             # it would probably make more sense to provide more info here.
             # like, the second tape
             yield head_pos, write, new_state, new_pos - shift_count
-            print(tape1,head_pos-shift_count, write, new_state, new_pos - shift_count,
-tape2)
             tape1[head_pos] = write
             tape2[head_pos2] = write2
+            print(tape1, tape2)
             head_pos = new_pos
             head_pos2 = new_pos2
             self.state = new_state
@@ -130,10 +160,8 @@ tape2)
 # Reads a TM description, returns an appropriate TM object
 # description is an iterator over lines
 def read_tm(description):
-    print("d", description)
     header = next(description)
     #analyze header fields
-    #print(header.split('|'))
     num_tapes, num_states, sigma, gamma, blank, F = header.split('|')
     if num_tapes == "1":
         return OneTapeTM(sigma, blank, description, num_tapes, num_states, gamma, F)
