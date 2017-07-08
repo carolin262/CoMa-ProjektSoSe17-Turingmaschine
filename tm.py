@@ -1,6 +1,10 @@
 import visual
 
 class TM(object):
+    # Turingmachine class which will be inherited by the more specified one
+    #   always starts with state q0, and head_pos =0
+    #   input_alphabet gets seperated from ,
+    #   table gets seperated from , and > 
     def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
         self.blank = blank
         self.F=F
@@ -70,16 +74,27 @@ class TM(object):
 
 class OneTapeTM(TM):
     #   class of One Tape Turingmachine,
-    #   vererbt bei Turingmachine class at the top
+    #   inherited of Turingmachine class at the top
     def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
         TM.__init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma,F)
 
     def exec_TM(self,inputstring):
-        #Input: inputstring Lis
+        #Input: inputstring String
+        #Output: List of Uebergangszustaenden for the visualisation
         return list(self.exec_TMHELP(inputstring))
 
     def exec_TMHELP(self, initial_tape):
-        assert self.check_input(initial_tape)
+        """
+        If input is not correct -> Assertion Error
+        endless remembers each position, thus infinitloops can be detected
+        If combination of state and tape-number exist
+            tape, head_position will be overwritten 
+            and yield returns them
+        Input: initial_tape String
+        Output: Tupel for Visualisation
+        """
+        ok=self.check_input(initial_tape)
+        assert  ok
         head_pos = 0
         tape = initial_tape[:]
         shift_count = 0;
@@ -107,20 +122,36 @@ class OneTapeTM(TM):
             tape[head_pos] = write
             head_pos = new_pos
             self.state = new_state
-            print(["B"]*(3-shift_count)+tape)
+            #print(["B"]*(3-shift_count)+tape)
 
 class TwoTapeTM(TM):
+    #   class of Two Tape Turingmachine,
+    #   inherited of Turingmachine class at the top
+
     def __init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F):
         TM.__init__(self, input_alphabet, blank, description, num_tapes, num_states, gamma, F)
         head_pos2 = 0
 
     
     def exec_TM(self,inputstring):
+        #Input: inputstring String
+        #Output: List of Uebergangszustaenden for the visualisation
         return list(self.exec_TMHELP(inputstring))
 
     def exec_TMHELP(self, initial_tape, initial_tape2=[]):
-        assert self.check_input(initial_tape)
-        assert self.check_input(initial_tape2)
+        """
+        If input is not correct -> Assertion Error
+        endless remembers each position, thus infinitloops can be detected
+        If combination of state and tape-number exist
+            both: tape, head_position will be overwritten 
+            and yield returns them
+        Input: initial_tape String
+        Output: Tupel for Visualisation
+        """
+        ok=self.check_input(initial_tape)
+        assert ok
+        ok2=self.check_input(initial_tape2)
+        assert ok2
         head_pos, head_pos2 = 0,0
         tape1 = initial_tape[:]
         tape2 = initial_tape2[:]
@@ -142,15 +173,15 @@ class TwoTapeTM(TM):
             new_state, write, write2, direct, direct2 = self.table[state_tuple]
             new_pos = head_pos + self.translate_dir(direct)
             new_pos2 = head_pos2 + self.translate_dir(direct2)
-            print(direct, direct2, new_pos, new_pos2)
-            print(tape1, tape2)
+            #print(direct, direct2, new_pos, new_pos2)
+            #print(tape1, tape2)
             # this is just for compatibility with the one tape machine.
             # it would probably make more sense to provide more info here.
             # like, the second tape
             yield head_pos, write, new_state, new_pos - shift_count
             tape1[head_pos] = write
             tape2[head_pos2] = write2
-            print(tape1, tape2)
+            #print(tape1, tape2)
             head_pos = new_pos
             head_pos2 = new_pos2
             self.state = new_state
