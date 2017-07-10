@@ -1,17 +1,28 @@
 import tm
 import visual
 import os, sys, subprocess
+from pathlib import Path
 
 if len(sys.argv) < 4: #ueberprueft auf BOM
     #fragt nach input
     inpu=input("Gebe hier die Inputliste, wie folgt ein (z.B 1,0,0,1,0) : ")
     inp=inpu.split(',')
     filename=input("Gebe hier bitte den Filename wie folgt als String ein: ./filename :")
-    viewer=input("Gebe hier den Viewer mit Name an bei d wird der Defaultviewer benutzt : " )
+    viewer=input("Gebe hier den Viewer mit Pfad an bei d wird der Defaultviewer benutzt : " )
 
 else:
     _, inpu, filename, viewer = sys.argv
     inp = inpu.split(',')
+
+# Ueberprueft ob der PDF-Reader existiert, wenn nicht frag nach neuem Reader
+my_file = Path(str(viewer))
+print(my_file, my_file.is_file())
+while my_file.is_file() == False and viewer != 'd' :
+    viewer=input("Gebe hier einen existierenden Viewer mit Pfad an, bei d wird der Defaultviewer benutzt : " )
+    my_file = Path(str(viewer))
+    print(my_file, my_file.is_file())
+
+
 
 #liest Datei ein und gibt Mal-Kommandos zurueck
 turingmachine=tm.TM._parse_file(filename)

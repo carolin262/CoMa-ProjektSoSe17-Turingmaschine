@@ -276,6 +276,6 @@ class VisualTM:
         if self.viewername=='':
             os.startfile(pdf)
         else:
-            subprocess.Popen((self.viewername, pdf))
+            assert subprocess.Popen((self.viewername, pdf))
 
 
