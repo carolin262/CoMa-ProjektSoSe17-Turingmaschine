@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+
 # -*- coding: utf-8 -*-
 import os, sys, subprocess, copy
 
@@ -213,7 +214,7 @@ class VisualTM:
         Erstellt das Band in Tikz
         mit 13 Feldern wird das Tape zurechtgeschnitten und uebersetzt
         """
-        #schreibt für jedes Element auf dem listband
+        #schreibt fÃ¼r jedes Element auf dem listband
         #einen Knoten auf dem Band
         band=""
         anzeige=[]
@@ -252,7 +253,7 @@ class VisualTM:
         """
         Input: data String  tikz-dokument
         erstellt eine Datei mit dem Namen TMvisual.tex
-        schreibt das tikz-dokument hinein und schließt die Datei wieder
+        schreibt das tikz-dokument hinein und schliesst die Datei wieder
         """
         TMVisual = open("TMvisual.tex", "w")
         TMVisual.write(data)
@@ -275,6 +276,6 @@ class VisualTM:
         if self.viewername=='':
             os.startfile(pdf)
         else:
-            subprocess.Popen("%s %s" % (self.viewername, pdf))
+            subprocess.Popen((self.viewername, pdf))
 
 

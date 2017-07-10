@@ -165,7 +165,7 @@ class TwoTapeTM(TM):
             shift_count2 += shift2
 
             state_tuple = (self.state, tape1[head_pos], tape2[head_pos2])
-            print("state",state_tuple, head_pos, head_pos2)
+            #print("state",state_tuple, head_pos, head_pos2)
             if not state_tuple in self.table:
                 break # no transition left
 
@@ -181,7 +181,7 @@ class TwoTapeTM(TM):
             yield head_pos, write, new_state, new_pos - shift_count
             tape1[head_pos] = write
             tape2[head_pos2] = write2
-            #print(tape1, tape2)
+            print("Tape1: ",tape1,"Tape2: ", tape2)
             head_pos = new_pos
             head_pos2 = new_pos2
             self.state = new_state
